@@ -1,13 +1,24 @@
 package mn.clinic.supplies.domain.model;
 
 import java.time.LocalDate;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Future;
 
 public class Supply {
 
     private Long id;
+
+    @NotNull(message = "Supply name cannot be null")
     private String name;
+    
+    @Min(value = 1, message = "Quantity must be at least 1")
     private int quantity;
+    
+    @Future(message = "Expiry date must be in the future")
     private LocalDate expiryDate;
+    
+    @NotNull(message = "Supplier cannot be null")
     private String supplier;
 
     public Supply() {
