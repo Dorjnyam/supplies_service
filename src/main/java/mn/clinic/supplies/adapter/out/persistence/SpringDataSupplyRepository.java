@@ -12,5 +12,4 @@ public interface SpringDataSupplyRepository extends JpaRepository<SupplyJpaEntit
     Page<SupplyJpaEntity> findByExpiryDate(String expiryDate, Pageable pageable);
     List<SupplyJpaEntity> findByNameContainingOrSupplierContaining(String name, String supplier);
     List<SupplyJpaEntity> findByNameContainingIgnoreCaseOrSupplierContainingIgnoreCase(String name, String supplier);
-
 }

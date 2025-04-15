@@ -1,21 +1,24 @@
 package mn.clinic.supplies.domain.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Future;
 
+@Entity
+@Table(name = "supplies")
 public class Supply {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull(message = "Supply name cannot be null")
     private String name;
     
-    @Min(value = 1, message = "Quantity must be at least 1")
+    @Min(value = 0, message = "Quantity must be at least 0")
     private int quantity;
     
-    @Future(message = "Expiry date must be in the future")
     private LocalDate expiryDate;
     
     @NotNull(message = "Supplier cannot be null")

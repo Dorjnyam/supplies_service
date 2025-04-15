@@ -28,4 +28,7 @@ public interface SupplyRepositoryPort {
 
     List<Supply> findByNameContainingOrSupplierContaining(String name, String supplier);
 
+    // New method to update a supply
+    Supply updateSupply(Long id, Supply updatedSupply); 
+
 }

@@ -7,6 +7,7 @@ import mn.clinic.supplies.domain.model.Supply;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +42,7 @@ public class SupplyService implements ManageSupplyUseCase {
             updatedSupply.setExpiryDate(supply.getExpiryDate());
             updatedSupply.setSupplier(supply.getSupplier());
 
-            repository.save(updatedSupply);  // Save the updated supply
+            repository.updateSupply(supply.getId(), updatedSupply);
             kafkaProducer.sendMessage("updated-supplies", updatedSupply.toString());  // Send update message to Kafka
         }
     }

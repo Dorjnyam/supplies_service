@@ -57,7 +57,10 @@ public class SupplyAdapterController {
         
         // Fetch filtered supplies with pagination
         Page<Supply> supplies = supplyUseCase.listSuppliesWithPagination(pageable, name, supplier, expiryDate);
-        
+
+        // Send a message to Kafka about fetching supplies
+        kafkaProducer.sendMessage("Fetched supplies list. Page: " + page + " Size: " + size);
+
         return ResponseEntity.ok(supplies.getContent());
     }
 
@@ -83,6 +86,9 @@ public class SupplyAdapterController {
         // Save the updated supply
         supplyUseCase.updateSupply(existingSupply);
 
+        // Send a message to Kafka about updating the supply
+        kafkaProducer.sendMessage("Updated supply with ID: " + id + ", Name: " + existingSupply.getName());
+
         return ResponseEntity.ok(existingSupply);  // Return the updated supply
     }
 
@@ -94,12 +100,21 @@ public class SupplyAdapterController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);  // Supply not found
         }
 
+        // Send a message to Kafka about deleting the supply
+        kafkaProducer.sendMessage("Deleted supply with ID: " + id);
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);  // Successfully deleted
     }
 
+    // Endpoint to search supplies based on a query
     @GetMapping("/search")
-public List<Supply> searchSupplies(@RequestParam("query") String query) {
-    return supplyUseCase.searchSupplies(query);
-}
+    public List<Supply> searchSupplies(@RequestParam("query") String query) {
+        // Perform the search operation
+        List<Supply> supplies = supplyUseCase.searchSupplies(query);
 
+        // Send a message to Kafka about the search
+        kafkaProducer.sendMessage("Searched for supplies with query: " + query);
+
+        return supplies;
+    }
 }

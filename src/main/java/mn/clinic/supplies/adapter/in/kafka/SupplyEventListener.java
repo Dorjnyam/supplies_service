@@ -16,10 +16,30 @@ public class SupplyEventListener {
         this.supplyUseCase = supplyUseCase;
     }
 
+    // Listener for new supplies (add supply)
     @KafkaListener(topics = "new-supplies", groupId = "clinic-supply-consumer")
-    public void listen(String message) throws Exception {
+    public void listenNewSupply(String message) throws Exception {
         Supply supply = objectMapper.readValue(message, Supply.class);
         supplyUseCase.addSupply(supply);
         System.out.println("✅ Received and saved new supply from Kafka: " + supply.getName());
+    }
+
+    // Listener for updating supplies (update supply)
+    @KafkaListener(topics = "update-supplies", groupId = "clinic-supply-consumer")
+    public void listenUpdateSupply(String message) throws Exception {
+        Supply supply = objectMapper.readValue(message, Supply.class);
+        supplyUseCase.updateSupply(supply);
+        System.out.println("🔄 Updated supply with ID: " + supply.getId());
+    }
+
+    // Listener for deleting supplies (delete supply)
+    @KafkaListener(topics = "delete-supplies", groupId = "clinic-supply-consumer")
+    public void listenDeleteSupply(Long message) throws Exception {
+        boolean isDeleted = supplyUseCase.deleteSupply(message);
+        if (isDeleted) {
+            System.out.println("🔴 Deleted supply with ID: " + message);
+        } else {
+            System.out.println("⚠️ Failed to delete supply with ID: " + message + " (not found)");
+        }
     }
 }

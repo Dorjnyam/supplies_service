@@ -5,6 +5,7 @@ import mn.clinic.supplies.domain.model.Supply;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import mn.clinic.supplies.domain.exception.SupplyNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -117,17 +118,48 @@ public class SupplyPersistenceAdapter implements SupplyRepositoryPort {
     }
 
     @Override
-public List<Supply> findByNameContainingOrSupplierContaining(String name, String supplier) {
-    return repository.findByNameContainingIgnoreCaseOrSupplierContainingIgnoreCase(name, supplier)
-            .stream()
-            .map(entity -> new Supply(
-                    entity.getId(),
-                    entity.getName(),
-                    entity.getQuantity(),
-                    entity.getExpiryDate(),
-                    entity.getSupplier()
-            ))
-            .collect(Collectors.toList());
-}
+    public List<Supply> findByNameContainingOrSupplierContaining(String name, String supplier) {
+        return repository.findByNameContainingIgnoreCaseOrSupplierContainingIgnoreCase(name, supplier)
+                .stream()
+                .map(entity -> new Supply(
+                        entity.getId(),
+                        entity.getName(),
+                        entity.getQuantity(),
+                        entity.getExpiryDate(),
+                        entity.getSupplier()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Supply updateSupply(Long id, Supply updatedSupply) {
+        // Fetch the existing supply
+        Optional<SupplyJpaEntity> existingSupplyOptional = repository.findById(id);
+        if (existingSupplyOptional.isPresent()) {
+            SupplyJpaEntity existingSupply = existingSupplyOptional.get();
+            
+            // Update the existing entity's fields
+            existingSupply.setName(updatedSupply.getName());
+            existingSupply.setQuantity(updatedSupply.getQuantity());
+            existingSupply.setExpiryDate(updatedSupply.getExpiryDate());
+            existingSupply.setSupplier(updatedSupply.getSupplier());
+
+            // Save the updated supply entity
+            repository.save(existingSupply);
+
+            // Return the updated Supply
+            return new Supply(
+                    existingSupply.getId(),
+                    existingSupply.getName(),
+                    existingSupply.getQuantity(),
+                    existingSupply.getExpiryDate(),
+                    existingSupply.getSupplier()
+            );
+        } else {
+            // Throw an exception or handle the case when the supply is not found
+            throw new SupplyNotFoundException("Supply with ID " + id + " not found.");
+        }
+    }
+
 
 }
